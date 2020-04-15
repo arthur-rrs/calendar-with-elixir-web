@@ -46,6 +46,10 @@ export default {
   },
   methods: {
     login: function() {
+      this.hasError = false;
+      for (const key in this.errors) {
+        this.errors[key] = false;
+      }
       const url = process.env.VUE_APP_URL + "/login";
       axios.post(url, this.user)
         .then((response) => {

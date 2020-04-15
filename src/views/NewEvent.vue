@@ -2,7 +2,7 @@
   <div class="container">
     <top-bar :btnValue="'Calendário'" :btnPath="'/'"></top-bar>
     <div class="row">
-      <div class="col-6 offset-3">
+      <div class="col-md-6 offset-md-3 col-12">
         <form @submit.prevent="submitForm()">
           <div class="form-group">
           <label for="title-event">Titulo do evento</label>
@@ -63,6 +63,10 @@ export default {
   },
   methods: {
     submitForm: function() {
+      this.hasError = false;
+      for (const key in this.errors) {
+        this.errors[key] = false;
+      }
       axios.defaults.headers.common['Authorization'] = "Bearer " + localStorage.getItem('x-token');
       const url = process.env.VUE_APP_URL + '/api/event'
       this.eventInput['user_id'] = localStorage.getItem("user-id")
