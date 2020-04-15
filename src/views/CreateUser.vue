@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     submitForm: function() {
-      const url = process.env.VUE_APP_URL + '/api/user' 
+      const url = process.env.VUE_APP_URL + '/user' 
       axios.post(url, this.user)
         .then(() => {
           this.user = {}
