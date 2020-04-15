@@ -32,15 +32,12 @@
 import axios from 'axios'
 import TopBar from '../components/TopBar'
 
-axios.defaults.headers.common['Authorization'] = "Bearer " + localStorage.getItem('x-token');
-
 export default {
   components: {
     TopBar
   },
-  created() {
+  mounted() {
     this.update(); 
-            
   },
   data() {
     return {
@@ -50,18 +47,32 @@ export default {
   },
   methods: {
     deleteEvent: function(id) {
+      axios.defaults.headers.common['Authorization'] = "Bearer " + localStorage.getItem('x-token');
       const url = process.env.VUE_APP_URL + "/api/event/" + id;
       axios.delete(url).then(() => {
         this.update();
-      });
+      }).catch(error => {
+       const status = error.response.status;
+       if (401 === status) {
+         localStorage.clear();
+         this.$router.push({"name": "Login"});
+       }
+     });
     },
     update: function() {
+      axios.defaults.headers.common['Authorization'] = "Bearer " + localStorage.getItem('x-token');
       const date = this.$route.params.date;
       const url = process.env.VUE_APP_URL +
                 "/api/myevents/" + date + "/" + date;
       axios.get(url).then(response => {
         this.events = response.data;
-      });
+      }).catch(error => {
+       const status = error.response.status;
+       if (401 === status) {
+         localStorage.clear();
+         this.$router.push({"name": "Login"});
+       }
+     });
     }
   }
 }

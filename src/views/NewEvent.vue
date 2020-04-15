@@ -40,8 +40,6 @@
 import axios from 'axios'
 import TopBar from '../components/TopBar'
 
-axios.defaults.headers.common['Authorization'] = "Bearer " + localStorage.getItem('x-token');
-
 export default {
   components: {
     TopBar
@@ -54,13 +52,20 @@ export default {
   },
   methods: {
     submitForm: function() {
+      axios.defaults.headers.common['Authorization'] = "Bearer " + localStorage.getItem('x-token');
       const url = process.env.VUE_APP_URL + '/api/event'
       this.eventInput['user_id'] = localStorage.getItem("user-id")
       axios.post(url, this.eventInput)
         .then(() => {
           this.eventInput = {}
           this.hasSave = true
-        })
+        }).catch(error => {
+       const status = error.response.status;
+       if (401 === status) {
+         localStorage.clear();
+         this.$router.push({"name": "Login"});
+       }
+     })
     } 
   }
 }

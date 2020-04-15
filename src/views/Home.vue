@@ -26,7 +26,7 @@ export default {
     Calendar,
     TopBar
   },
-  created() {
+  mounted() {
     this.month = this.currentMonth;
     this.year = this.currentYear;
     this.updateCalendar();
@@ -43,12 +43,19 @@ export default {
 
     },
     updateCalendar: function() {
+      axios.defaults.headers.common['Authorization'] = "Bearer " + localStorage.getItem('x-token');
       let withZero = (this.month+1) >= 10 ? "-" : "-0";
       const start = this.year + withZero + (this.month+1) + "-01";
       const last = this.year + withZero + (this.month+1) + "-" + this.lastday;
       const url = process.env.VUE_APP_URL + '/api/myevents/' + start + '/' + last;
       axios.get(url).then(response => {
         this.events = response.data;
+     }).catch(error => {
+       const status = error.response.status;
+       if (401 === status) {
+         localStorage.clear();
+         this.$router.push({"name": "Login"});
+       }
      });
     },
     previousMonth: function() {

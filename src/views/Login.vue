@@ -51,9 +51,11 @@ export default {
         .then((response) => {
           localStorage.setItem('x-token', response.headers['x-token']);
           localStorage.setItem('user-id', response.data['id']);
-          this.$router.push("/")
-        })
-        .catch(error => {
+       })
+       .then(() => {
+         this.$router.push({"name": "Home"})
+       })
+       .catch(error => {
           const status = error.response.status;
           const data = error.response.data;
           if (400 == status) {
