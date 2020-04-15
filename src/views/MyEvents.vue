@@ -2,7 +2,7 @@
   <div class="container">
     <top-bar :btnValue="'Calendário'" :btnPath="'/'"></top-bar>
     <div class="row mt-3">
-      <div class="col-6 offset-3">
+      <div class="col-md-6 col-12 offset-md-3">
         <h3>Eventos de {{date_at}}</h3>
         <table class="table">
           <thead>

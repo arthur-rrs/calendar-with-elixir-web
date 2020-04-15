@@ -6,19 +6,19 @@
         <form @submit.prevent="submitForm()">
           <div class="form-group">
           <label for="title-event">Titulo do evento</label>
-          <input id="input-name" type="text" class="form-control" v-model="eventInput.name">
+          <input :class="{'is-invalid': errors.name}" id="input-name" type="text" class="form-control" v-model="eventInput.name">
           </div>
           <div class="form-group">
             <label for="">Data do evento</label>
-            <input id="input-date_at" type="date" class="form-control" v-model="eventInput.date_at">
+            <input :class="{'is-invalid': errors.date_at}" id="input-date_at" type="date" class="form-control" v-model="eventInput.date_at">
           </div>
           <div class="form-group">
             <label for="">Horario do Evento</label>
-            <input id="input-time_at" type="time" class="form-control" v-model="eventInput.time_at">
+            <input :class="{'is-invalid': errors.time_at}" id="input-time_at" type="time" class="form-control" v-model="eventInput.time_at">
           </div>
           <div class="form-group">
             <label for="">Descrição do Evento</label>
-            <textarea id="input-description" cols="3" class="form-control" v-model="eventInput.description">
+            <textarea :class="{'is-invalid': errors.description}" id="input-description" cols="3" class="form-control" v-model="eventInput.description">
             </textarea>
           </div>
           <div class="form-group form-check">
@@ -28,6 +28,9 @@
           <button class="btn btn-primary">Agendar</button>
           <div class="alert alert-primary mt-3" v-show="hasSave">
             O Evento foi registrado no calendario com sucesso.
+          </div>
+          <div class="alert alert-danger mt-3" v-show="hasError">
+            {{errormessage}}
           </div>
         </form>
       </div>
@@ -47,7 +50,15 @@ export default {
   data() {
     return {
       eventInput: {},
-      hasSave: false
+      hasSave: false,
+      hasError: false,
+      errormessage: "",
+      errors: {
+        "name": false,
+        "date_at": false,
+        "time_at": false,
+        "description": false
+      }
     };
   },
   methods: {
@@ -60,11 +71,24 @@ export default {
           this.eventInput = {}
           this.hasSave = true
         }).catch(error => {
-       const status = error.response.status;
-       if (401 === status) {
-         localStorage.clear();
-         this.$router.push({"name": "Login"});
-       }
+          const status = error.response.status;
+          const data = error.response.data;
+          if (400 == status) {
+            data.forEach(current => {
+              const key = current[0];
+              this.errors[key] = true;
+            });
+            this.hasError = "true";
+            this.errormessage = "Verifique o campo incorreto!";
+          } 
+          if (401 === status) {
+            localStorage.clear();
+            this.$router.push({"name": "Login"});
+          }
+          if (500 <= status) {
+            this.hasError = true;
+            this.errormessage = "Ocorreu um erro no servidor, " + data;
+          }
      })
     } 
   }
