@@ -1,16 +1,16 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="offset-4 col-4 mt-2">
+      <div class="offset-4 col-md-4 col-12 mt-2">
         <h4 class="text-center">Calendário para registrar seus eventos</h4>
         <form @submit.prevent="login()">
           <div class="form-group">
-            <label for="">Seu e-mail ou username</label>
-            <input type="email" class="form-control" v-model="user.email">
+            <label for="">Seu e-mail</label>
+            <input type="email" class="form-control" :class="{'is-invalid': errors.email}" v-model="user.email">
           </div>
           <div class="form-group">
             <label for="">Sua senha</label>
-            <input type="password" class="form-control" v-model="user.password">
+            <input type="password" class="form-control" :class="{'is-invalid': errors.password}" v-model="user.password">
           </div>
           <button class="btn btn-primary">Entrar</button>
           <div class="alert alert-danger mt-2" v-show="hasError">
@@ -37,7 +37,11 @@ export default {
     return {
       user: {},
       hasError: false,
-      errormessage: ""
+      errormessage: "",
+      errors: {
+        email: false,
+        password: false
+      }
     };
   },
   methods: {
@@ -50,8 +54,29 @@ export default {
           this.$router.push("/")
         })
         .catch(error => {
-          this.errormessage = errorMessages[error.response.data];
-          this.hasError = true;
+          const status = error.response.status;
+          const data = error.response.data;
+          if (400 == status) {
+            data.forEach(current => {
+              const key = current[0];
+              console.log(this.errors[key]);
+              this.errors[key] = true;
+            });
+            this.hasError = "true";
+            this.errormessage = "Verifique o campo incorreto!";
+          } 
+          if (401 == status) {
+            this.hasError = true;
+            this.errormessage = errorMessages[data];  
+          }
+          if (409 == status) {
+            this.hasError = true;
+            this.errormessage = "O Usuário já tem o email ou username cadastrado." 
+          }
+          if (500 == status) {
+            this.hasError = true;
+            this.errormessage = "Ocorreu um erro no servidor, " + data;
+          }
         })
     }
   }
