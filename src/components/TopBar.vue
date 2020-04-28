@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav class="navbar navbar-light bg-white">
-      <span class="navbar-brand mb-0 h1">Calendar with Elixir</span>
+      <span class="navbar-brand mb-0 h1">AgendaWeb</span>
       <router-link :to="btnPath" class="btn btn-primary mb-0">
           {{btnValue}}
       </router-link>
